@@ -25,29 +25,32 @@ def forum(request, topic):
 
     if request.method == "POST":
 
-        # forms.pyを導入した場合のデータを作成するやり方に書き換え
-        if "message" in request.POST:
+        if request.user.is_authenticated:
 
-            message_form = MessageForm(request.POST)
+            if "message" in request.POST:
 
-            if message_form.is_valid():
-                message_form.instance.topic = topic
-                message = message_form.save()
-                for tag in message_form.cleaned_data["tag"]:
-                    message.tag.add(tag)
+                message_form = MessageForm(request.POST)
 
-        elif "comment" in request.POST:
+                if message_form.is_valid():
+                    message_form.instance.topic = topic
+                    message_form.instance.user = request.user
+                    message = message_form.save()
+                    for tag in message_form.cleaned_data["tag"]:
+                        message.tag.add(tag)
+
+            elif "comment" in request.POST:
+                
+                comment_form = CommentForm(request.POST)
+                if comment_form.is_valid():
+
+                    message_id = request.POST["comment"]
+                    message = Message.objects.get(id=message_id)
+
+                    comment_form.instance.message = message
+                    comment_form.instance.user = request.user
+                    comment_form.save()
             
-            comment_form = CommentForm(request.POST)
-            if comment_form.is_valid():
-
-                message_id = request.POST["comment"]
-                message = Message.objects.get(id=message_id)
-
-                comment_form.instance.message = message
-                comment_form.save()
-        
-        return redirect('forum:forum', topic=topic.name)
+            return redirect('forum:forum', topic=topic.name)
 
     message_form = MessageForm()
     comment_form = CommentForm()
