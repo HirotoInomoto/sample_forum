@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Topic, Message
 
 def index(request):
@@ -11,25 +11,23 @@ def index(request):
 
 def forum(request, topic):
     topic = Topic.objects.get(name=topic)
-    messages = Message.objects.filter(topic=topic).order_by("created_at")
+    messages = Message.objects.filter(topic=topic).prefetch_related('tag').order_by("created_at")
 
     if request.method == "POST":
 
+        # forms.pyを導入した場合のデータを作成するやり方に書き換え
         if "message" in request.POST:
-            
-            # データの作成１
-            # これまで扱っていた
-            # モデルに対してcreateメソッドを使用してデータを作成するやり方
-            message = request.POST["message"]
-            Message.objects.create(
-                topic=topic,
-                content=message,
-            )
+
+            message_form = MessageForm(request.POST)
+
+            if message_form.is_valid():
+                message_form.instance.topic = topic
+                message = message_form.save()
+                for tag in message_form.cleaned_data["tag"]:
+                    message.tag.add(tag)
 
         elif "comment" in request.POST:
             
-            # データの作成２
-            # forms.pyを導入した場合のデータを作成するやり方
             comment_form = CommentForm(request.POST)
             if comment_form.is_valid():
 
@@ -38,12 +36,16 @@ def forum(request, topic):
 
                 comment_form.instance.message = message
                 comment_form.save()
+        
+        return redirect('forum:forum', topic=topic.name)
 
+    message_form = MessageForm()
     comment_form = CommentForm()
 
     context = {
         "messages": messages,
         "topic": topic,
+        "message_form": message_form,
         "comment_form": comment_form,
     }
     return render(request, "forum/forum.html", context)

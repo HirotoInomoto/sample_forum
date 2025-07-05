@@ -16,6 +16,9 @@
             <tr>
                 <th>{{ message.content }}</th>
                 <th>{{ message.created_at }}</th>
+                {% for tag in message.tag.all %}
+                    <th>{{ tag.name }}</th>
+                {% endfor %}
             </tr>
             <tr>
                 <th>{{ comment_form }}</th>
@@ -26,8 +29,8 @@
     </table>
     <form action="{% url 'forum:forum' topic.name %}" method="POST">
         {% csrf_token %}
-        <input type="text" name="message">
-        <input type="submit" value="投稿">
+        {{ message_form }}
+        <button type="submit" name="message" value="value">送信</button>
     </form>
     <a href="{% url 'forum:index' %}">ホームへ</a>
 </body>
