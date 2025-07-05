@@ -11,7 +11,17 @@ def index(request):
 
 def forum(request, topic):
     topic = Topic.objects.get(name=topic)
-    messages = Message.objects.filter(topic=topic).prefetch_related('tag').order_by("created_at")
+    # 途中まで１行で書いていたが
+    # messages = Message.objects.filter(topic=topic).prefetch_related('tag', 'comment').order_by("created_at")
+    # 複数行で書いた方がみやすい
+    messages = (
+        Message.objects.filter(topic=topic)
+        .annotate(
+            reply_num=Count("comment"),
+        )
+        .prefetch_related("tag", "comment")
+        .order_by("created_at")
+    )
 
     if request.method == "POST":
 

@@ -19,7 +19,16 @@
                 {% for tag in message.tag.all %}
                     <th>{{ tag.name }}</th>
                 {% endfor %}
+                <th>コメント数 : {{ message.reply_num }}</th>
             </tr>
+
+            {% for comment in message.comment.all %}
+                <tr>
+                    <th>{{ comment.content }}</th>
+                    <th>{{ comment.created_at }}</th>
+                </tr>
+            {% endfor %}
+
             <tr>
                 <th>{{ comment_form }}</th>
                 <th><button type="submit" name="comment" value="{{ message.id }}">コメント</button></th>
