@@ -4,6 +4,6 @@ from . import views
 app_name = "forum"
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('<topic>/', views.forum, name='forum'),
+    path('', views.indeIndexView.as_view()x, name='index'),
+    path('<topic>/', views.ForumView.as_view(), name='forum'),
 ]
