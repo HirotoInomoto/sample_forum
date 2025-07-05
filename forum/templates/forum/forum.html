@@ -11,10 +11,17 @@
     <h2>{{ topic.name }}</h2>
     <table>
         {% for message in messages %}
-        <tr>
-            <th>{{ message.content }}</th>
-            <th>{{ message.created_at }}</th>
-        </tr>
+        <form action="{% url 'forum:forum' topic.name %}" method="POST">
+            {% csrf_token %}
+            <tr>
+                <th>{{ message.content }}</th>
+                <th>{{ message.created_at }}</th>
+            </tr>
+            <tr>
+                <th>{{ comment_form }}</th>
+                <th><button type="submit" name="comment" value="{{ message.id }}">コメント</button></th>
+            </tr>
+        </form>
         {% endfor %}
     </table>
     <form action="{% url 'forum:forum' topic.name %}" method="POST">
