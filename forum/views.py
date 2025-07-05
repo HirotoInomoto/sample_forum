@@ -6,7 +6,7 @@ def index(request):
     context = {
         "topics": TOPIC_LIST
     }
-    return render(request, "forum/index.html", )
+    return render(request, "forum/index.html", context)
 
 
 def forum(request, topic):
