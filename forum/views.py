@@ -22,7 +22,7 @@ def forum(request, topic):
     except:
         pass
 
-    contxt = {
+    context = {
         "messages": messages,
         "topic": topic,
     }
